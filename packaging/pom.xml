@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>demo-parent</artifactId>
+        <groupId>org.rpm</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>packaging</artifactId>
+    <packaging>rpm</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.rpm</groupId>
+            <artifactId>demo</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>filter-scripts</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/target/scripts/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>src/main/scripts/**</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Create the rpm package -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>rpm-maven-plugin</artifactId>
+                <version>2.2.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <targetOS>linux</targetOS>
+                    <group>TestRPM</group>
+                    <summary>TestRPM</summary>
+                    <description/>
+                    <copyright>Commercial</copyright>
+                    <vendor>TestRPM</vendor>
+                    <packager>TestRPM</packager>
+                    <repackJars>false</repackJars>
+                    <release>0</release>
+                    <needarch>noarch</needarch>
+                    <distribution>TestForRPM</distribution>
+                    <mappings>
+                        <mapping>
+                            <directory>/opt/components/repo</directory>
+                            <filemode>-</filemode>
+                            <username>root</username>
+                            <groupname>root</groupname>
+                            <sources>
+                                <source>
+                                    <location>../demo/target/demo-0.0.1-SNAPSHOT.jar</location>
+                                </source>
+                            </sources>
+                        </mapping>
+                    </mappings>
+                    <preinstallScriptlet>
+                        <scriptFile>target/scripts/src/main/scripts/preinstall</scriptFile>
+                    </preinstallScriptlet>
+                    <postinstallScriptlet>
+                        <scriptFile>target/scripts/src/main/scripts/postinstall</scriptFile>
+                    </postinstallScriptlet>
+                    <preremoveScriptlet>
+                        <scriptFile>target/scripts/src/main/scripts/preremove</scriptFile>
+                    </preremoveScriptlet>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+
+</project>
